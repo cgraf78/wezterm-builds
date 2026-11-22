@@ -54,8 +54,8 @@ overwrite an existing draft, release, or tag.
 
 ## Move or roll back the dotfiles pin
 
-Download `snapshot.lock` from the selected release and render the Shdeps lock
-with its release URLs. Run these commands from this repository:
+Download `snapshot.lock` from the selected release and render the shared
+WezTerm lock with its release URLs. Run these commands from this repository.
 
 ```sh
 tag=snapshot-YYYYMMDD
@@ -64,13 +64,16 @@ gh release download "$tag" --repo cgraf78/wezterm-builds --pattern snapshot.lock
 python3 scripts/snapshot.py lock --manifest "$stage/snapshot.lock" --tag "$tag" > "$stage/wezterm-build.lock"
 ```
 
-Replace `.config/shdeps/hooks.d/wezterm-build.lock` in the dotfiles checkout
-with the generated file. Review and land that change, then run `dot update`.
-To roll back, render the lock for an earlier snapshot or revert a commit
-that moved the pin between snapshots. The older package must still be
-compatible with the system. On Linux the ordinary installed check compares
-package and executable versions; an explicit reinstall verifies the archive
-checksum even when its version is already installed.
+Replace `.github/actions/shell-ci-prereqs/wezterm-build.lock` in
+`cgraf78/actions` with the generated file. Review the change and use the shared
+consumer sync to update dotfiles and Termnav together. Shdeps uses the
+synchronized local lock on the next `dot update`. [Shared pin procedure](https://github.com/cgraf78/actions/blob/main/docs/workflow-api.md#updating-the-managed-wezterm-build)
+
+To roll back between published snapshots, render the lock for the earlier
+release and follow the same consumer sync. The older packages must still be
+compatible with the system. On Linux the installed check verifies the native
+package versions, CLI build, and GUI executable. An explicit reinstall
+verifies the archive checksum even when its version is already installed.
 
 ## Supporting script
 
